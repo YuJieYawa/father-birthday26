@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>老登的36岁生日宴</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(255,176,102,.55) 0%, transparent 45%),
+      radial-gradient(circle at 100% 105%, rgba(255,122,69,.35) 0%, transparent 45%),
+      linear-gradient(160deg, #2a140b 0%, #160a05 100%);
+    background-attachment: fixed;
+    color: #fff8ec;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding: 16px;
+  }
+  .app { width: 100%; max-width: 460px; position: relative; }
+  .hide { display: none !important; }
+
+  .music-btn {
+    position: fixed; top: 14px; right: 14px; z-index: 50;
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 1px solid rgba(255,200,140,.35);
+    background: rgba(42,20,11,.75);
+    color: #ffd9a8; font-size: 20px; cursor: pointer;
+    backdrop-filter: blur(6px);
+  }
+
+  /* 封面 */
+  .cover {
+    min-height: calc(100vh - 32px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; gap: 10px;
+  }
+  .chef {
+    font-size: 86px; line-height: 1;
+    animation: float 2.8s ease-in-out infinite;
+    filter: drop-shadow(0 16px 24px rgba(0,0,0,.35));
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-12px) rotate(2deg); }
+  }
+  .cover h1 {
+    font-size: 30px; letter-spacing: 2px; color: #fff3df;
+    text-shadow: 0 4px 20px rgba(255,140,60,.35);
+  }
+  .cover .sub {
+    color: #ffc98a; font-size: 14px; letter-spacing: 3px; margin-bottom: 22px;
+  }
+  .btn {
+    border: none; border-radius: 999px;
+    padding: 16px 42px; font-size: 17px; font-weight: 700;
+    color: #3a1608;
+    background: linear-gradient(135deg, #ffd47a, #ff9f43);
+    box-shadow: 0 12px 28px rgba(255,140,50,.35), inset 0 -3px 0 rgba(0,0,0,.12);
+    cursor: pointer; letter-spacing: 2px;
+    transition: transform .15s;
+  }
+  .btn:active { transform: scale(.96); }
+  .cover .tip { margin-top: 16px; font-size: 12px; color: #b98a63; letter-spacing: 1px; }
+
+  /* 游戏页 */
+  .game { padding: 28px 0 40px; text-align: center; }
+  .game h2 { font-size: 20px; color: #ffe7c4; letter-spacing: 1px; margin-bottom: 6px; }
+  .progress { font-size: 13px; color: #ffbf80; letter-spacing: 2px; margin-bottom: 20px; }
+  .progress b { color: #ffd47a; font-size: 16px; }
+
+  .menu {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 26px;
+  }
+  .slot {
+    aspect-ratio: 1 / 1; min-height: 160px;
+    border-radius: 20px;
+    border: 2px dashed rgba(255,200,140,.28);
+    background: rgba(255,248,236,.05);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+    transition: all .35s;
+  }
+  .slot .q { font-size: 44px; color: rgba(255,200,140,.3); font-weight: 900; }
+  .slot.filled {
+    border: 2px solid rgba(255,212,122,.55);
+    background: linear-gradient(160deg, rgba(255,240,215,.16), rgba(255,190,120,.08));
+    box-shadow: 0 10px 30px rgba(255,140,50,.12);
+    animation: pop .4s ease;
+    cursor: pointer;
+  }
+  .slot.filled:active { transform: scale(.97); }
+  @keyframes pop {
+    0% { transform: scale(.8); }
+    60% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+  .slot .emoji { font-size: 60px; line-height: 1; }
+  .slot .name { font-size: 18px; color: #ffe7c4; font-weight: 700; letter-spacing: 1px; }
+  .slot .tap { font-size: 12px; color: #c99a6b; letter-spacing: 1px; }
+  .hint { margin-top: 14px; font-size: 12px; color: #b98a63; letter-spacing: 1px; }
+
+  /* 弹窗 */
+  .modal {
+    position: fixed; inset: 0; z-index: 40;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    background: rgba(10,4,2,.72);
+    backdrop-filter: blur(6px);
+    animation: fadeIn .3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .dish-card {
+    width: 100%; max-width: 340px;
+    border-radius: 26px; padding: 30px 24px 26px;
+    text-align: center;
+    background: linear-gradient(170deg, #fff8ec, #ffe9cf);
+    color: #3d2417;
+    box-shadow: 0 30px 70px rgba(0,0,0,.5);
+    animation: rise .38s cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes rise {
+    from { transform: translateY(40px) scale(.92); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  .dish-emoji { font-size: 66px; line-height: 1; margin-bottom: 8px; }
+  .dish-tag {
+    display: inline-block; font-size: 11px; letter-spacing: 2px;
+    color: #c2410c; background: rgba(255,159,67,.18);
+    border-radius: 999px; padding: 4px 12px; margin-bottom: 10px;
+  }
+  .dish-card h3 { font-size: 24px; margin-bottom: 6px; color: #7c2d12; letter-spacing: 1px; }
+  .dish-real { font-size: 12px; color: #b45309; letter-spacing: 1px; margin-bottom: 14px; }
+  .dish-card p.desc { font-size: 15px; line-height: 1.8; color: #57341f; margin-bottom: 22px; }
+  .dish-card .btn { padding: 13px 36px; font-size: 15px; }
+
+  /* 蛋糕区 */
+  .cake-area { text-align: center; animation: fadeIn .5s ease; }
+  .cake-hint {
+    font-size: 14px; color: #ffd47a; letter-spacing: 2px; margin-bottom: 10px;
+    animation: blink 1.4s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+
+  .cake {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto;
+    cursor: pointer;
+    user-select: none;
+    filter: drop-shadow(0 16px 30px rgba(0,0,0,0.4));
+  }
+
+  .flame-group {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .cake.blown .flame-group {
+    opacity: 0;
+    transform: scale(0.3) translateY(20px);
+  }
+
+  /* 证书 */
+  .cert {
+    width: 100%; max-width: 360px;
+    border-radius: 24px; padding: 30px 24px;
+    background: linear-gradient(170deg, #fff8ec, #ffedd2);
+    color: #3d2417; text-align: center;
+    border: 2px solid #e8b76a;
+    box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 0 0 6px rgba(255,255,255,.55);
+    animation: rise .45s cubic-bezier(.2,.9,.3,1.2);
+    max-height: 86vh; overflow-y: auto;
+  }
+  .cert-badge { font-size: 52px; line-height: 1; margin-bottom: 6px; }
+  .cert h2 { font-size: 24px; color: #b45309; letter-spacing: 2px; margin-bottom: 12px; }
+  .cert-line {
+    height: 2px; margin: 0 10px 16px;
+    background: linear-gradient(90deg, transparent, #e8b76a, transparent);
+  }
+  .cert p { font-size: 14px; line-height: 1.9; color: #57341f; }
+  .cert .big {
+    font-size: 20px; font-weight: 800; color: #c2410c;
+    margin: 12px 0 6px; letter-spacing: 1px;
+  }
+  .cert .sign { margin-top: 16px; font-size: 12px; color: #a16207; letter-spacing: 1px; }
+  .cert .btn { margin-top: 18px; padding: 12px 32px; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<button class="music-btn" id="musicBtn" title="音乐">🔇</button>
+
+<div class="app">
+
+  <!-- 封面 -->
+  <section class="cover" id="cover">
+    <div class="chef">🎂</div>
+    <h1>老登的36岁生日宴</h1>
+    <p class="sub">私房菜专场 · 今天您最大</p>
+    <button class="btn" id="startBtn">开席，抽一道菜</button>
+    <p class="tip">集齐 4 道菜解锁蛋糕</p>
+  </section>
+
+  <!-- 游戏页 -->
+  <section class="game hide" id="game">
+    <h2>老登私房菜 · 36岁生日大餐</h2>
+    <p class="progress">已收集 <b id="count">0</b> / 4 道菜</p>
+
+    <div class="menu" id="menu">
+      <div class="slot" data-id="salad"><span class="q">?</span></div>
+      <div class="slot" data-id="braise"><span class="q">?</span></div>
+      <div class="slot" data-id="wing"><span class="q">?</span></div>
+      <div class="slot" data-id="noodle"><span class="q">?</span></div>
+    </div>
+
+    <button class="btn" id="drawBtn">抽一道菜</button>
+    <p class="hint" id="hint">集齐 4 道菜，解锁 36 岁限定蛋糕</p>
+
+    <div class="cake-area hide" id="cakeArea">
+      <p class="cake-hint" id="cakeHint">🎂 点击蛋糕，吹灭蜡烛</p>
+      
+      <!-- 完美对齐的圆点花边蛋糕 -->
+      <div class="cake" id="cake">
+        <svg viewBox="0 0 300 300" width="100%" height="100%">
+          <defs>
+            <pattern id="candy-stripe" width="12" height="12" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+              <rect width="12" height="12" fill="#B3DDFF" />
+              <rect width="6" height="12" fill="#FFC8D6" />
+            </pattern>
+            <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FFEA00" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#FFEA00" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <!-- 盘子 -->
+          <ellipse cx="150" cy="265" rx="130" ry="20" fill="rgba(0,0,0,0.2)"/>
+          <ellipse cx="150" cy="255" rx="125" ry="22" fill="#FFFFFF" stroke="#4A90E2" stroke-width="4"/>
+          <ellipse cx="150" cy="250" rx="110" ry="16" fill="#F2F8FF" stroke="#4A90E2" stroke-width="3"/>
+
+          <!-- 蛋糕主体（平滑的一层） -->
+          <path d="M 45 110 L 45 235 A 105 20 0 0 0 255 235 L 255 110 Z" fill="#A8D8FF" stroke="#4A90E2" stroke-width="4"/>
+
+          <!-- 底部圆形花边（左到右，精准贴边） -->
+          <circle cx="45" cy="245" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="62" cy="250" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="83" cy="255" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="105" cy="257" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="127" cy="258" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="150" cy="259" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="173" cy="258" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="195" cy="257" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="217" cy="255" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="238" cy="250" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="255" cy="245" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+
+          <!-- 蛋糕顶面 -->
+          <ellipse cx="150" cy="110" rx="105" ry="20" fill="#B9E2FF" stroke="#4A90E2" stroke-width="4"/>
+
+          <!-- 顶部糖珠 -->
+          <circle cx="80" cy="110" r="3" fill="#FFD700"/>
+          <circle cx="140" cy="100" r="3" fill="#FFD700"/>
+          <circle cx="190" cy="105" r="3" fill="#FFD700"/>
+          <circle cx="210" cy="115" r="3" fill="#FFD700"/>
+          <circle cx="110" cy="120" r="3" fill="#FFD700"/>
+          <circle cx="165" cy="118" r="3" fill="#FFD700"/>
+
+          <!-- 顶部后弧花边（极坐标计算，完美对称） -->
+          <circle cx="62" cy="101" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="83" cy="95" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="105" cy="91" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="127" cy="90" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="150" cy="90" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="173" cy="90" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="195" cy="91" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="217" cy="95" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+          <circle cx="238" cy="101" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"></circle>
+
+          <!-- 3号蜡烛组（向右平移 23） -->
+          <g transform="translate(23, 0)">
+            <rect x="85" y="115" width="30" height="12" fill="#FFF" stroke="#4A90E2" stroke-width="3" rx="3"/>
+            <line x1="100" y1="115" x2="100" y2="50" stroke="#4A90E2" stroke-width="3" stroke-linecap="round"/>
+            
+            <text x="100" y="110" font-family="'Arial Rounded MT Bold', 'PingFang SC', sans-serif" font-weight="900" font-size="70" text-anchor="middle" fill="none" stroke="#4A90E2" stroke-width="14" paint-order="stroke fill">3</text>
+            <text x="100" y="110" font-family="'Arial Rounded MT Bold', 'PingFang SC', sans-serif" font-weight="900" font-size="70" text-anchor="middle" fill="none" stroke="#FFFFFF" stroke-width="6" paint-order="stroke fill">3</text>
+            <text x="100" y="110" font-family="'Arial Rounded MT Bold', 'PingFang SC', sans-serif" font-weight="900" font-size="70" text-anchor="middle" fill="url(#candy-stripe)">3</text>
+
+            <g class="flame-group" style="transform-origin: 100px 45px;">
+              <circle cx="100" cy="40" r="22" fill="url(#glow)" />
+              <path d="M 100 60 C 85 45, 95 25, 100 20 C 105 25, 115 45, 100 60 Z" fill="#FFE066" stroke="#FFC300" stroke-width="3" />
+              <path d="M 100 52 C 92 45, 98 35, 100 30 C 102 35, 108 45, 100 52 Z" fill="#FFFFFF" />
+            </g>
+          </g>
+
+          <!-- 6号蜡烛组（向左平移 23） -->
+          <g transform="translate(-23, 0)">
+            <rect x="185" y="115" width="30" height="12" fill="#FFF" stroke="#4A90E2" stroke-width="3" rx="3"/>
+            <line x1="200" y1="115" x2="200" y2="50" stroke="#4A90E2" stroke-width="3" stroke-linecap="round"/>
+            
+            <text x="200" y="110" font-family="'Arial Rounded MT Bold', 'PingFang SC', sans-serif" font-weight="900" font-size="70" text-anchor="middle" fill="none" stroke="#4A90E2" stroke-width="14" paint-order="stroke fill">6</text>
+            <text x="200" y="110" font-family="'Arial Rounded MT Bold', 'PingFang SC', sans-serif" font-weight="900" font-size="70" text-anchor="middle" fill="none" stroke="#FFFFFF" stroke-width="6" paint-order="stroke fill">6</text>
+            <text x="200" y="110" font-family="'Arial Rounded MT Bold', 'PingFang SC', sans-serif" font-weight="900" font-size="70" text-anchor="middle" fill="url(#candy-stripe)">6</text>
+
+            <g class="flame-group" style="transform-origin: 200px 45px;">
+              <circle cx="200" cy="40" r="22" fill="url(#glow)" />
+              <path d="M 200 60 C 185 45, 195 25, 200 20 C 205 25, 215 45, 200 60 Z" fill="#FFE066" stroke="#FFC300" stroke-width="3" />
+              <path d="M 200 52 C 192 45, 198 35, 200 30 C 202 35, 208 45, 200 52 Z" fill="#FFFFFF" />
+            </g>
+          </g>
+
+          <!-- 顶部前弧花边（覆盖在底座和数字前方，形成完美的立体遮挡） -->
+          <circle cx="45" cy="110" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"/>
+          <circle cx="62" cy="119" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"/>
+          <circle cx="83" cy="125" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"/>
+          <circle cx="105" cy="129" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"/>
+          <circle cx="127" cy="130" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"/>
+          <circle cx="150" cy="130" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"/>
+          <circle cx="173" cy="130" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"/>
+          <circle cx="195" cy="129" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"/>
+          <circle cx="217" cy="125" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"/>
+          <circle cx="238" cy="119" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"/>
+          <circle cx="255" cy="110" r="13" fill="#FFFDF5" stroke="#4A90E2" stroke-width="3"/>
+
+        </svg>
+      </div>
+      
+    </div>
+  </section>
+</div>
+
+<!-- 菜卡弹窗 -->
+<div class="modal hide" id="modal">
+  <div class="dish-card">
+    <div class="dish-emoji" id="dishEmoji">🥒</div>
+    <div class="dish-tag" id="dishTag">今日限定 · 寿星专享</div>
+    <h3 id="dishName">拍黄瓜</h3>
+    <p class="dish-real" id="dishReal">手擀面</p>
+    <p class="desc" id="dishBlessing"></p>
+    <button class="btn" id="acceptBtn">收下这道菜</button>
+  </div>
+</div>
+
+<!-- 最终证书 -->
+<div class="modal hide" id="finalModal">
+  <div class="cert">
+    <div class="cert-badge">🏅</div>
+    <h2>米其林三星爸爸</h2>
+    <div class="cert-line"></div>
+    <p>经家庭厨房委员会认证：</p>
+    <p>老登同志连续 <b>36</b> 年稳定输出父爱，</p>
+    <p>厨艺在线，颜值在线，</p>
+    <p>家务全包，随叫随到，</p>
+    <p>特授予「米其林三星爸爸」称号。</p>
+    <p class="big">36岁生日快乐！</p>
+    <p>新的一岁：锅里有菜，卡里有钱，心里有爱。</p>
+    <div class="sign">—— 家庭厨房委员会 · 曾浩宇</div>
+    <button class="btn" id="finalClose">收下祝福</button>
+  </div>
+</div>
+
+<script>
+/* ========== 菜谱数据 ========== */
+const dishes = [
+  {
+    id: 'salad',
+    name: '拍黄瓜',
+    real: '',
+    emoji: '🥒',
+    blessing: '刀背一拍，蒜末一撒，清脆爽口。下酒下饭都很绝，这味道绝对正宗。'
+  },
+  {
+    id: 'braise',
+    name: '红烧肉',
+    real: '',
+    emoji: '🍖',
+    blessing: '肥而不腻，入口即化，纯正老登手艺。吃了这块肉，新的一年红红火火，福气满满。'
+  },
+  {
+    id: 'wing',
+    name: '可乐鸡翅',
+    real: '',
+    emoji: '🍗',
+    blessing: '色泽红亮，甜咸适口。吃了这道菜，日子像可乐一样甜，每天都有好心情。'
+  },
+  {
+    id: 'noodle',
+    name: '长寿面',
+    real: '手擀面',
+    emoji: '🍜',
+    blessing: '手擀面一碗，长度不限，快乐管够，续碗免费。吃完这碗，福气长长长。'
+  }
+];
+
+let drawn = [];
+let currentDish = null;
+let isReview = false;
+
+const $ = id => document.getElementById(id);
+const cover = $('cover'), game = $('game');
+const startBtn = $('startBtn'), drawBtn = $('drawBtn'), hint = $('hint');
+const countEl = $('count'), modal = $('modal'), menu = $('menu');
+const dishEmoji = $('dishEmoji'), dishName = $('dishName');
+const dishReal = $('dishReal'), dishBlessing = $('dishBlessing'), dishTag = $('dishTag');
+const acceptBtn = $('acceptBtn');
+const cakeArea = $('cakeArea'), cake = $('cake'), cakeHint = $('cakeHint');
+const finalModal = $('finalModal'), finalClose = $('finalClose');
+const musicBtn = $('musicBtn');
+
+/* ========== 音乐：Web Audio 合成生日快乐 ========== */
+let audioCtx = null, masterGain = null;
+let musicPlaying = false, musicTimer = null, nextNoteTime = 0, melodyIndex = 0;
+
+function initAudio() {
+  if (audioCtx) return;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+  audioCtx = new AC();
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.5;
+  masterGain.connect(audioCtx.destination);
+}
+
+const MELODY = [
+  [392,0.5],[392,0.5],[440,1],[392,1],[523,1],[494,2],
+  [392,0.5],[392,0.5],[440,1],[392,1],[587,1],[523,2],
+  [392,0.5],[392,0.5],[784,1],[659,1],[523,1],[494,1],[440,2],
+  [698,0.5],[698,0.5],[659,1],[523,1],[587,1],[523,2]
+];
+const BEAT = 0.42;
+
+function tone(freq, start, dur, type, vol) {
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, start);
+  g.gain.setValueAtTime(0.0001, start);
+  g.gain.exponentialRampToValueAtTime(vol, start + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  osc.connect(g); g.connect(masterGain);
+  osc.start(start); osc.stop(start + dur + 0.05);
+}
+
+function scheduler() {
+  if (!musicPlaying) return;
+  while (nextNoteTime < audioCtx.currentTime + 0.3) {
+    const [freq, beats] = MELODY[melodyIndex];
+    const dur = beats * BEAT;
+    tone(freq, nextNoteTime, dur * 0.9, 'triangle', 0.16);
+    if (melodyIndex === 0 || melodyIndex === 6 || melodyIndex === 13 || melodyIndex === 20) {
+      tone(freq / 2, nextNoteTime, dur * 1.7, 'sine', 0.09);
+    }
+    nextNoteTime += dur;
+    melodyIndex = (melodyIndex + 1) % MELODY.length;
+  }
+  musicTimer = setTimeout(scheduler, 120);
+}
+
+function startMusic() {
+  initAudio();
+  if (!audioCtx || musicPlaying) return;
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  musicPlaying = true;
+  melodyIndex = 0;
+  nextNoteTime = audioCtx.currentTime + 0.08;
+  scheduler();
+}
+
+function stopMusic() {
+  musicPlaying = false;
+  clearTimeout(musicTimer);
+}
+
+musicBtn.addEventListener('click', () => {
+  if (musicPlaying) { stopMusic(); musicBtn.textContent = '🔇'; }
+  else { startMusic(); musicBtn.textContent = '🔊'; }
+});
+
+/* ========== 打开菜卡 ========== */
+function openDish(dish, review) {
+  currentDish = dish;
+  isReview = !!review;
+  dishEmoji.textContent = dish.emoji;
+  dishName.textContent = dish.name;
+  
+  // 只有长寿面显示标签和“手擀面”说明，其他隐藏
+  if (dish.id === 'noodle') {
+    dishTag.style.display = 'inline-block';
+    dishReal.style.display = 'block';
+    dishReal.textContent = dish.real;
+  } else {
+    dishTag.style.display = 'none';
+    dishReal.style.display = 'none';
+  }
+
+  dishBlessing.textContent = dish.blessing;
+  acceptBtn.textContent = isReview ? '好的，继续' : '收下这道菜';
+  modal.classList.remove('hide');
+}
+
+/* ========== 流程 ========== */
+startBtn.addEventListener('click', () => {
+  startMusic();
+  musicBtn.textContent = '🔊';
+  cover.classList.add('hide');
+  game.classList.remove('hide');
+});
+
+drawBtn.addEventListener('click', () => {
+  if (!musicPlaying) { startMusic(); musicBtn.textContent = '🔊'; }
+  const remaining = dishes.filter(d => !drawn.includes(d.id));
+  if (!remaining.length) return;
+
+  const dish = remaining[Math.floor(Math.random() * remaining.length)];
+  openDish(dish, false);
+
+  if (audioCtx) {
+    const t = audioCtx.currentTime;
+    tone(880, t, 0.12, 'sine', 0.18);
+    tone(1320, t + 0.1, 0.18, 'sine', 0.14);
+  }
+});
+
+acceptBtn.addEventListener('click', () => {
+  if (!currentDish) return;
+
+  if (isReview) {
+    modal.classList.add('hide');
+    return;
+  }
+
+  drawn.push(currentDish.id);
+  revealSlot(currentDish);
+  modal.classList.add('hide');
+  countEl.textContent = drawn.length;
+  currentDish = null;
+  isReview = false;
+
+  if (drawn.length === 4) {
+    drawBtn.classList.add('hide');
+    hint.classList.add('hide');
+    cakeArea.classList.remove('hide');
+    setTimeout(() => cakeArea.scrollIntoView({ behavior:'smooth', block:'center' }), 200);
+  }
+});
+
+function revealSlot(dish) {
+  const slot = document.querySelector('.slot[data-id="' + dish.id + '"]');
+  if (!slot) return;
+  slot.classList.add('filled');
+  slot.innerHTML =
+    '<span class="emoji">' + dish.emoji + '</span>' +
+    '<span class="name">' + dish.name + '</span>' +
+    '<span class="tap">点击回看</span>';
+}
+
+/* 点击已抽到的菜，回看详情 */
+menu.addEventListener('click', (e) => {
+  const slot = e.target.closest('.slot');
+  if (!slot || !slot.classList.contains('filled')) return;
+  const dish = dishes.find(d => d.id === slot.dataset.id);
+  if (dish) openDish(dish, true);
+});
+
+/* 吹蜡烛 */
+cake.addEventListener('click', () => {
+  if (cake.classList.contains('blown')) {
+    finalModal.classList.remove('hide');
+    return;
+  }
+  cake.classList.add('blown');
+  cakeHint.textContent = '✨ 愿望已送达，生日快乐！';
+  cakeHint.style.animation = 'none';
+  cakeHint.style.opacity = '1';
+  if (audioCtx) tone(220, audioCtx.currentTime, 0.5, 'sine', 0.12);
+  setTimeout(() => finalModal.classList.remove('hide'), 900);
+});
+
+finalClose.addEventListener('click', () => {
+  finalModal.classList.add('hide');
+});
+</script>
+</body>
+</html>
